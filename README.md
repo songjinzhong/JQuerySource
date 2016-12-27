@@ -1,2 +1,23 @@
-# JQuerySource
-决定你走多远的是基础，JQuery 源码分析，向长者膜拜！
+# jQuerySource
+决定你走多远的是基础，jQuery 源码分析，向长者膜拜！
+
+我虽然接触 jQuery 很久了，但也只是局限于表面使用的层次，碰到一些问题，找到 jQuery 的解决办法，然后使用。**显然**，这种做法的弊端就是，无论你怎么学，都只能是个小白。
+
+当我建立这个项目的时候，就表示，我要改变这一切了，做一些人想做，憧憬去做，但从没踏入第一步的事情，学习 jQuery 源码。
+
+到目前为止，jQuery 的[贡献者团队](https://github.com/jquery/jquery)共 256 名成员，6000 多条 commits，可想而知，jQuery 是一个多么庞大的项目。jQuery [官方](https://jquery.com/)的版本目前是 v3.1.1，已经衍生出 jQueryUI、jQueryMobile 等多个项目。
+
+虽然我在前端爬摸打滚一年多，自认基础不是很好，在没有外界帮助的情况下，直接阅读项目源码太难了，所以在边参考遍实践的过程中写下来这个项目。
+
+**首先**，先推荐一个 jQuery 的[源码查询](http://james.padolsey.com/jquery/)网站，这个网站给初学者非常大的帮助，不仅能查找不同版本的 jQuery 源码，还能索引函数，功能简直吊炸天。
+
+另外，推荐两个分析 jQuery 的博客：
+
+>[jQuery源码分析系列](http://www.cnblogs.com/aaronjs/p/3279314.html)
+>[[原创] jQuery1.6.1源码分析系列（停止更新）](http://www.cnblogs.com/nuysoft/archive/2011/11/14/2248023.html)
+
+这两个博客给我了很大的帮助，谢谢。
+
+另外还有下面的网址，让我在如何使用 jQuery 上得心应手：
+
+>[jQuery API 中文文档](http://www.css88.com/jqapi-1.9/)
