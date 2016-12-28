@@ -457,5 +457,7 @@ jQuery.isPlainObject(function(){});// false
 ## 参考
 
 >[jQuery 2.0.3 源码分析core - 整体架构](http://www.cnblogs.com/aaronjs/p/3278578.html)
+
 >[《jQuery源码解析》读书笔记（第二章：构造jQuery对象）](http://www.cnblogs.com/yiyang/p/4959373.html)
+
 >[jQuery.isPlainObject() 函数详解](http://www.365mini.com/page/jquery_isplainobject.htm)

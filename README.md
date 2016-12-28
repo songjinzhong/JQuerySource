@@ -14,6 +14,7 @@
 另外，推荐两个分析 jQuery 的博客：
 
 >[jQuery源码分析系列](http://www.cnblogs.com/aaronjs/p/3279314.html)
+
 >[[原创] jQuery1.6.1源码分析系列（停止更新）](http://www.cnblogs.com/nuysoft/archive/2011/11/14/2248023.html)
 
 这两个博客给我了很大的帮助，谢谢。
@@ -21,3 +22,8 @@
 另外还有下面的网址，让我在如何使用 jQuery 上得心应手：
 
 >[jQuery API 中文文档](http://www.css88.com/jqapi-1.9/)
+
+## 目录
+
+- Directory
+  + [x] [1-总体架构](https://github.com/songjinzhong/JQuerySource/tree/master/1-%E6%80%BB%E4%BD%93%E6%9E%B6%E6%9E%84)- 只有弄懂整体架构，后面的学习才好办
