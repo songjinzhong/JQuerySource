@@ -41,7 +41,8 @@ init: function (selector, context, root) {
 
   // 处理 HTML 字符串情况，包括 $("<div>")、$("#id")、$(".class")
   if (typeof selector === "string") {
-  //拆分 1，留在后面讲
+
+  //此部分拆分，留在后面讲
 
   // HANDLE: $(DOMElement)
   } else if (selector.nodeType) {
@@ -72,31 +73,48 @@ init: function (selector, context, root) {
 在介绍下面的内容之前，先来介绍一个 jQuery 中一个识别 Html 字符串的正则表达式，
 
 ```javascript
-var reg = /^(?:\s*(<[\w\W]+>)[^>]*|#([\w-]+))$/,
-
+var rquickExpr = /^(?:\s*(<[\w\W]+>)[^>]*|#([\w-]+))$/;
+rquickExpr.exec('<div>') //["<div>", "<div>", undefined]
+rquickExpr.exec('<div></div>') //["<div></div>", "<div></div>", undefined]
+rquickExpr.exec('#id')//["#id", undefined, "id"]
+rquickExpr.exec('.class')//null
 ```
 
-下面来看下重点的处理 HTMl 字符串的情况
+上面这一系列的正则表达式 exec，只是为了说明 `rquickExpr` 这个正则表达式执行后的结果，首先，如果匹配到，结果数组的长度是 3，如果匹配到 '<div>' 这种 html，数组的第三个元素是 underfined，如果匹配到 #id，数组的第二个元素是 underfined，如果匹配不到，则为 null。
+
+另外还有一个正则表达式：
+
+```javascript
+var rsingleTag = ( /^<([a-z][^\/\0>:\x20\t\r\n\f]*)[\x20\t\r\n\f]*\/?>(?:<\/\1>|)$/i );
+rsingleTag.test('<div></div>') //true
+rsingleTag.test('<div ></div>') //true
+rsingleTag.test('<div class="cl"></div>') //false
+rsingleTag.test('<div></ddiv>') //false
+```
+
+这个正则表达式主要是对 html 的字符串进行验证，达到不出差错的效果。在这里不多介绍 exec 和正则表达式了。
+
+下面来看下重点的处理 HTMl 字符串的情况：
 
 ```javascript
 if (selector[0] === "<" && selector[selector.length - 1] === ">" && selector.length >= 3) {
-
-  // Assume that strings that start and end with <> are HTML and skip the regex check
+  // 这个其实是强行构造了匹配 html 的情况的数组
   match = [null, selector, null];
 
 } else {
   match = rquickExpr.exec(selector);
 }
 
-// Match html or make sure no context is specified for #id
+// macth[1] 限定了 html，!context 对 #id 处理
 if (match && (match[1] || !context)) {
 
   // HANDLE: $(html) -> $(array)
   if (match[1]) {
+    //排除 context 是 jQuery 对象情况
     context = context instanceof jQuery ? context[0] : context;
 
-    // Option to run scripts is true for back-compat
-    // Intentionally let the error be thrown if parseHTML is not present
+    // jQuery.merge 是专门针对 jQuery 合并数组的方法
+    // jQuery.parseHTML 是针对 html 字符串转换成 DOM 对象
     jQuery.merge(this, jQuery.parseHTML(
     match[1], context && context.nodeType ? context.ownerDocument || context : document, true));
 
@@ -104,7 +122,7 @@ if (match && (match[1] || !context)) {
     if (rsingleTag.test(match[1]) && jQuery.isPlainObject(context)) {
       for (match in context) {
 
-        // Properties of context are called as methods if possible
+        // 此时的 match 非彼时的 match
         if (jQuery.isFunction(this[match])) {
           this[match](context[match]);
 
@@ -117,26 +135,175 @@ if (match && (match[1] || !context)) {
 
     return this;
 
-  // HANDLE: $(#id)
-} else {
-  elem = document.getElementById(match[2]);
+  // 处理 match(1) 为 underfined 但 !context 的情况
+  } else {
+    elem = document.getElementById(match[2]);
 
   if (elem) {
 
-    // Inject the element directly into the jQuery object
+    // this[0] 返回一个标准的 jQuery 对象
     this[0] = elem;
     this.length = 1;
   }
   return this;
 }
-
-  // HANDLE: $(expr, $(...))
+// 处理一般的情况，find 实际上上 Sizzle，jQuery 已经将其包括进来，下章详细介绍
+// jQuery.find() 为 jQuery 的选择器，性能良好
 } else if (!context || context.jquery) {
   return (context || root).find(selector);
-
-  // HANDLE: $(expr, context)
-  // (which is just equivalent to: $(context).find(expr)
+// 处理 !context 情况
 } else {
+  // 这里 constructor 其实是 指向 jQuery 的
   return this.constructor(context).find(selector);
 }
 ```
+
+关于 nodeType，这是 DOM 的一个属性，详情 [Node.nodeType MDN](https://developer.mozilla.org/zh-CN/docs/Web/API/Node/nodeType)。nodeType 的值一般是一个数字，比如 1 表示 DOM，3 表示文字等，也可以用这个值是否存在来判断 DOM 元素，比如 context.nodeType。
+
+整个 init 函数等构造逻辑，非常清晰，比如 `(selector, context, root)` 三个参数，分别表示选择的内容，可能存在的的限制对象或 Object，而 root 则默认的 jQuery(document)。依旧采用 jQuery 常用的方式，对每一个变量的处理都非常的谨慎。
+
+如果仔细看上面两部分源代码，我自己也加了注释，应该可以把整个过程给弄懂。
+
+find 函数实际上是 Sizzle，已经单独出来一个项目，被在 jQuery 中直接使用，将在下章介绍 jQuery 中的 Sizzle 选择器。通过源码，可以发现：
+
+```javascript
+jQuery.find = function Sizzle(){...}
+jQuery.fn.find = function(selector){
+  ...
+  //引用 jQuery.find
+  jQuery.find()
+  ...
+}
+```
+
+## 衍生的函数
+
+init 函数仍然调用了不少 jQuery 或 jQuery.fn 的函数，下面来逐个分析。
+
+### jQuery.merge
+
+这个函数通过名字，就知道它是用来干什么的，合并。
+
+```javascript
+jQuery.merge = function (first, second) {
+  var len = +second.length,
+    j = 0,
+    i = first.length;
+
+  for (; j < len; j++) {
+    first[i++] = second[j];
+  }
+
+  first.length = i;
+
+  return first;
+}
+```
+
+这样子就可以对类似于数组且有 length 参数的类型进行合并，我感觉主要还是为了方便对 jQuery 对象的合并，因为 jQuery 对象就是有 length 的。
+
+### jQuery.parseHTML
+
+这个函数也非常有意思，就是将一串 HTML 字符串转成 DOM 对象。
+
+首先函数接受三个参数，第一个参数 data 即为 html 字符串，第二个参数是 document 对象，但要考虑到浏览器的兼容性，第三个参数 keepScripts 是为了删除节点里所有的 script tags，但在 parseHTML 里面没有体现，主要还是给 buildFragment 当作参数。总之返回的对象，是一个 DOM 数组或空数组。
+
+```javascript
+jQuery.parseHTML = function (data, context, keepScripts) {
+  if (typeof data !== "string") {
+    return [];
+  }
+  // 平移参数
+  if (typeof context === "boolean") {
+    keepScripts = context;
+    context = false;
+  }
+
+  var base, parsed, scripts;
+
+  if (!context) {
+
+    // 下面这段话的意思就是在 context 缺失的情况下，建立一个 document 对象
+    if (support.createHTMLDocument) {
+      context = document.implementation.createHTMLDocument("");
+      base = context.createElement("base");
+      base.href = document.location.href;
+      context.head.appendChild(base);
+    } else {
+      context = document;
+    }
+  }
+  // 用来解析 parsed，比如对 "<div></div>" 的处理结果 parsed：["<div></div>", "div"]
+  // parsed[1] = "div"
+  parsed = rsingleTag.exec(data);
+  scripts = !keepScripts && [];
+
+  // Single tag
+  if (parsed) {
+    return [context.createElement(parsed[1])];
+  }
+  // 见下方解释
+  parsed = buildFragment([data], context, scripts);
+
+  if (scripts && scripts.length) {
+    jQuery(scripts).remove();
+  }
+
+  return jQuery.merge([], parsed.childNodes);
+}
+```
+
+`buildFragment` 函数主要是用来建立一个包含子节点的 fragment 对象，用于频发操作的添加删除节点。`parsed = buildFragment([data], context, scripts);`建立好一个 fragment 对象，用 parsed.childNodes 来获取这些 data 对应的 HTML。
+
+### jQueyr.makeArray
+
+jQuery 里面的函数调用，真的是一层接一层，虽然有时候光靠函数名，就能知道这函数的作用，但其中思考之逻辑还是挺参考意义的。
+
+```javascript
+jQuery.makeArray = function (arr, results) {
+  var ret = results || [];
+
+  if (arr != null) {
+    if (isArrayLike(Object(arr))) {
+        jQuery.merge(ret, typeof arr === "string" ? [arr] : arr);
+    } else {
+        push.call(ret, arr);
+    }
+  }
+
+  return ret;
+}
+```
+
+makeArray 把左边的数组或字符串并入到右边的数组或一个新数组，其中又简介的引用 jQuery.merge 函数。
+
+接下来是着 isArrayLike 函数，可能需要考虑多方面的因素，比如兼容浏览器等，就有了下面这一长串：
+
+```javascript
+function isArrayLike(obj) {
+
+  // Support: real iOS 8.2 only (not reproducible in simulator)
+  // `in` check used to prevent JIT error (gh-2145)
+  // hasOwn isn't used here due to false negatives
+  // regarding Nodelist length in IE
+  var length = !!obj && "length" in obj && obj.length,
+      type = jQuery.type(obj);
+
+  if (type === "function" || jQuery.isWindow(obj)) {
+      return false;
+  }
+
+  return type === "array" || length === 0 || typeof length === "number" && length > 0 && (length - 1) in obj;
+}
+```
+
+## 总结
+
+这篇算是承上启下吧，介绍了 jQuery 中比较重要的入口函数，然后估计下章将会讲解 Sizzle，jQuery 中的选择器。
+
+## 参考
+>[jQuery 2.0.3 源码分析core - 选择器](http://www.cnblogs.com/aaronjs/p/3281911.html)
+
+>[Node.nodeType](https://developer.mozilla.org/zh-CN/docs/Web/API/Node/nodeType)
+
+>[jQuery 3.0的buildFragment](http://www.cnblogs.com/snandy/p/5760742.html)
