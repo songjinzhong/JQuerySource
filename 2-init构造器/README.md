@@ -66,7 +66,41 @@ init: function (selector, context, root) {
 
 可以看出，对于处理 `$(DOMElement)`，直接是把 jQuery 当作一个数组，this[0] = DOMElement。其实，这要从 jQuery 的基本构造讲起，我们完成一个 `$('div.span')` 之后，然后一个 jQuery 对象（this），其中会得到一组（一个）DOM 对象，jQuery 会把这组 DOM 对象当作数组元素添加过来，并给一个 length。后面就像一些链式函数操作的时候，若只能对一个 DOM 操作，比如 width、height，就只对第一个元素操作，若可以对多个 DOM 操作，则会对所有 DOM 进行操作，比如 css()。
 
-所以我们看到的处理 $(DOMElement) 时候，直接 return this。
+jQuery 大题思路如下，这是一个非常简单点实现：
+
+```javascript
+jQuery.prototype = {
+  // 简单点，假设此时 selector 用 querySelectorAll
+  init: function(selector){
+    var ele = document.querySelectorAll(selector);
+    // 把 this 当作数组，每一项都是 DOM 对象
+    for(var i = 0; i < ele.length; i++){
+      this[i] = ele[i];
+    }
+    this.length = ele.length;
+    return this;
+  },
+  //css 若只有一个对象，则取其第一个 DOM 对象
+  //若 css 有两个参数，则对每一个 DOM 对象都设置 css
+  css : function(attr,val){
+    for(var i = 0; i < this.length; i++){
+      if(val == undefined){
+        if(typeof attr === 'object'){
+          for(var key in attr){
+            this.css(key, attr[key]);
+          }
+        }else if(typeof attr === 'string'){
+          return getComputedStyle(this[i])[attr];
+        }
+      }else{
+        this[i].style[attr] = val;
+      }
+    }
+  },
+}
+```
+
+所以对于 DOMElement 的处理，直接将 DOM 赋值给数组后，return this。
 
 `jQuery.makeArray` 是一个绑定 数组的函数，和上面的原理一样，后面会谈到。
 
@@ -76,8 +110,8 @@ init: function (selector, context, root) {
 var rquickExpr = /^(?:\s*(<[\w\W]+>)[^>]*|#([\w-]+))$/;
 rquickExpr.exec('<div>') //["<div>", "<div>", undefined]
 rquickExpr.exec('<div></div>') //["<div></div>", "<div></div>", undefined]
-rquickExpr.exec('#id')//["#id", undefined, "id"]
-rquickExpr.exec('.class')//null
+rquickExpr.exec('#id') //["#id", undefined, "id"]
+rquickExpr.exec('.class') //null
 ```
 
 上面这一系列的正则表达式 exec，只是为了说明 `rquickExpr` 这个正则表达式执行后的结果，首先，如果匹配到，结果数组的长度是 3，如果匹配到 '<div>' 这种 html，数组的第三个元素是 underfined，如果匹配到 #id，数组的第二个元素是 underfined，如果匹配不到，则为 null。
