@@ -191,6 +191,129 @@ Sizzle 使用的是从右向左的选择方式，这种方式效率更高。
 
 因为子节点可以有若干个，而父节点只有一个，故从右向左的方式效率很高。
 
+## 衍生的函数
+
+### jQuery.fn.pushStack
+
+`jQuery.fn.pushStack`是一个类似于 jQuery.merge 的函数，它接受一个参数，把该参数（数组）合并到一个 jQuery 对象中并返回，源码如下：
+
+```javascript
+jQuery.fn.pushStack = function (elems) {
+
+  // Build a new jQuery matched element set
+  var ret = jQuery.merge(this.constructor(), elems);
+
+  // Add the old object onto the stack (as a reference)
+  ret.prevObject = this;
+
+  // Return the newly-formed element set
+  return ret;
+}
+```
+
+### jQuery.contains
+
+这个函数是对 DOM 判断是否是父子关系，源码如下：
+
+```javascript
+jQuery.contains = function (context, elem) {
+  // 考虑到兼容性，设置 context 的值
+  if ((context.ownerDocument || context) !== document) {
+    setDocument(context);
+  }
+  return contains(context, elem);
+}
+
+// contains 是内部函数，判断 DOM_a 是否是 DOM_b 的
+var contains =  function (a, b) {
+  var adown = a.nodeType === 9 ? a.documentElement : a,
+  bup = b && b.parentNode;
+  return a === bup || !!(bup && bup.nodeType === 1 && (
+  adown.contains ? adown.contains(bup) : a.compareDocumentPosition && a.compareDocumentPosition(bup) & 16));
+}
+```
+
+### jQuery.uniqueSort
+
+jQuery 的去重函数，但这个去重职能处理 DOM 元素数组，不能处理字符串或数字数组，来看看有什么特别的：
+
+```javascript
+jQuery.uniqueSort = function (results) {
+  var elem, duplicates = [],
+    j = 0,
+    i = 0;
+
+  // hasDuplicate 是一个判断是否有相同元素的 flag，全局
+  hasDuplicate = !support.detectDuplicates;
+  sortInput = !support.sortStable && results.slice(0);
+  results.sort(sortOrder);
+
+  if (hasDuplicate) {
+    while ((elem = results[i++])) {
+      if (elem === results[i]) {
+          j = duplicates.push(i);
+      }
+    }
+    while (j--) {
+      // splice 用于将重复的元素删除
+      results.splice(duplicates[j], 1);
+    }
+  }
+
+  // Clear input after sorting to release objects
+  // See https://github.com/jquery/sizzle/pull/225
+  sortInput = null;
+
+  return results;
+}
+```
+
+sortOrder 函数如下，需要将两个函数放在一起理解才能更明白哦：
+
+```javascript
+var sortOrder = function (a, b) {
+
+  // 表示有相同的元素，设置 flag 为 true
+  if (a === b) {
+    hasDuplicate = true;
+    return 0;
+  }
+
+  // Sort on method existence if only one input has compareDocumentPosition
+  var compare = !a.compareDocumentPosition - !b.compareDocumentPosition;
+  if (compare) {
+    return compare;
+  }
+
+  // Calculate position if both inputs belong to the same document
+  compare = (a.ownerDocument || a) === (b.ownerDocument || b) ? a.compareDocumentPosition(b) :
+
+  // Otherwise we know they are disconnected
+  1;
+
+  // Disconnected nodes
+  if (compare & 1 || (!support.sortDetached && b.compareDocumentPosition(a) === compare)) {
+
+    // Choose the first element that is related to our preferred document
+    if (a === document || a.ownerDocument === preferredDoc && contains(preferredDoc, a)) {
+        return -1;
+    }
+    if (b === document || b.ownerDocument === preferredDoc && contains(preferredDoc, b)) {
+        return 1;
+    }
+
+    // Maintain original order
+    return sortInput ? (indexOf(sortInput, a) - indexOf(sortInput, b)) : 0;
+  }
+
+  return compare & 4 ? -1 : 1;
+}
+```
+
+## 总结
+
+可以说今天先对 Sizzle 开个头，任重而道远！下面就会接受 Sizzle 中的 tokens 和 select 函数。
+
 ## 参考
 
 [jQuery 2.0.3 源码分析Sizzle引擎 - 词法解析](http://www.cnblogs.com/aaronjs/p/3300797.html)

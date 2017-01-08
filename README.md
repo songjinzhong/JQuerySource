@@ -27,5 +27,5 @@
 
 - Directory
   + [x] [1-总体架构](https://github.com/songjinzhong/JQuerySource/tree/master/1-%E6%80%BB%E4%BD%93%E6%9E%B6%E6%9E%84)- 只有弄懂整体架构，后面的学习才好办
-- Directory
-  + [x] [1-init 构造器](https://github.com/songjinzhong/JQuerySource/tree/master/2-init%E6%9E%84%E9%80%A0%E5%99%A8)- 介绍 jQuery 的入口函数 init 的构造
+  + [x] [2-init 构造器](https://github.com/songjinzhong/JQuerySource/tree/master/2-init%E6%9E%84%E9%80%A0%E5%99%A8)- 介绍 jQuery 的入口函数 init 的构造
+  + [x] [3-Sizzle](https://github.com/songjinzhong/JQuerySource/tree/master/3-Sizzle)- Sizzle 再 jQuery 中的应用
