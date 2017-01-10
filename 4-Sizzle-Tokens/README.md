@@ -96,7 +96,8 @@ Expr.filter = {
   "CLASS": function(){...},
   "ATTR": function(){...},
   "CHILD": function(){...},
-  ...
+  "ID": function(){...},
+  "PSEUDO": function(){...}
 }
 Expr.preFilter = {
   "ATTR": function(){...},
