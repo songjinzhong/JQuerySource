@@ -142,7 +142,7 @@ var matchExpr = {
 }
 ```
 
-matchExpr 作为正则表达式对象，将 type 匹配到，交给后续函数处理。
+matchExpr 作为正则表达式对象，其 key 的每一项都是一个 type 类型，将 type 匹配到，交给后续函数处理。
 
 tokensize 源码如下：
 
@@ -160,10 +160,10 @@ var tokensize = function (selector, parseOnly) {
 
   while (soFar) {
 
-    // Comma and first run
+    // 判断一个分组是否结束
     if (!matched || (match = rcomma.exec(soFar))) {
       if (match) {
-        // Don't consume trailing commas as valid
+        // 从字符串中删除匹配到的 match
         soFar = soFar.slice(match[0].length) || soFar;
       }
       groups.push((tokens = []));
@@ -171,21 +171,21 @@ var tokensize = function (selector, parseOnly) {
 
     matched = false;
 
-    // Combinators
+    // 连接符 rcombinators
     if ((match = rcombinators.exec(soFar))) {
       matched = match.shift();
       tokens.push({
         value: matched,
-        // Cast descendant combinators to space
         type: match[0].replace(rtrim, " ")
       });
       soFar = soFar.slice(matched.length);
     }
 
-    // Filters
+    // 过滤，Expr.filter 和 matchExpr 都已经介绍过了
     for (type in Expr.filter) {
       if ((match = matchExpr[type].exec(soFar)) && (!preFilters[type] || (match = preFilters[type](match)))) {
         matched = match.shift();
+        // 此时的 match 实际上是 shift() 后的剩余数组
         tokens.push({
           value: matched,
           type: type,
@@ -200,14 +200,43 @@ var tokensize = function (selector, parseOnly) {
     }
   }
 
-  // Return the length of the invalid excess
-  // if we're just parsing
-  // Otherwise, throw an error or return tokens
-  return parseOnly ? soFar.length : soFar ? Sizzle.error(selector) :
-  // Cache the tokens
-  tokenCache(selector, groups).slice(0);
+  // parseOnly 这个参数应该以后会用到
+  return parseOnly ? 
+    soFar.length : 
+    soFar ? 
+      Sizzle.error(selector) :
+      // 存入缓存
+      tokenCache(selector, groups).slice(0);
 }
 ```
+
+不仅数组，字符串也有 slice 操作，而且看源码的话，jQuery 中对字符串的截取，使用的都是 slice 方法。
+
+如果此时 parseOnly 不成立，则返回结果需从 tokenCache 这个函数中来查找：
+
+```javascript
+var tokenCache = createCache();
+function createCache() {
+  var keys = [];
+
+  function cache( key, value ) {
+    // Expr.cacheLength = 50
+    if ( keys.push( key + " " ) > Expr.cacheLength ) {
+      // 删，最不经常使用
+      delete cache[ keys.shift() ];
+    }
+    // 整个结果返回的是 value
+    return (cache[ key + " " ] = value);
+  }
+  return cache;
+}
+```
+
+可知，返回的结果是 groups，tokensize 就学完了，下章将介绍 tokensize 的后续。
+
+## 总结
+
+对于一个复杂的 selector，其 tokensize 的过程远比今天介绍的要复杂，今天的例子有点简单（其实也比较复杂了），后面的内容更精彩。
 
 ## 参考
 
