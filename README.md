@@ -29,5 +29,5 @@
   + [x] [1-总体架构](https://github.com/songjinzhong/JQuerySource/tree/master/1-%E6%80%BB%E4%BD%93%E6%9E%B6%E6%9E%84)- 只有弄懂整体架构，后面的学习才好办
   + [x] [2-init 构造器](https://github.com/songjinzhong/JQuerySource/tree/master/2-init%E6%9E%84%E9%80%A0%E5%99%A8)- 介绍 jQuery 的入口函数 init 的构造
   + [x] [3-Sizzle](https://github.com/songjinzhong/JQuerySource/tree/master/3-Sizzle)- Sizzle 再 jQuery 中的应用
-  + [x] [4-Sizzle-Tokens](https://github.com/songjinzhong/JQuerySource/tree/master/3-Sizzle-Tokens)- 介绍 Sizzle 函数中的词法分析，即 tokensize 函数
-  + [x] [5-Sizzle-select](https://github.com/songjinzhong/JQuerySource/tree/master/3-Sizzle-select)- 介绍 Sizzle 中的 select 函数，对词法分析的结果进行处理，生成 seed
+  + [x] [4-Sizzle-Tokens](https://github.com/songjinzhong/JQuerySource/tree/master/4-Sizzle-Tokens)- 介绍 Sizzle 函数中的词法分析，即 tokensize 函数
+  + [x] [5-Sizzle-select](https://github.com/songjinzhong/JQuerySource/tree/master/5-Sizzle-select)- 介绍 Sizzle 中的 select 函数，对词法分析的结果进行处理，生成 seed
