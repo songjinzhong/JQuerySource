@@ -403,6 +403,55 @@ Sizzle 虽然独立出去，单独成一个项目，不过在 jQuery 中的代�
 
 ![](http://images.cnitblog.com/blog/329084/201309/22100009-fb059131d1ed49519db4810fd8a4f20b.jpg)
 
+**第一步**
+
+```
+div > p + div.aaron input[type="checkbox"]
+```
+
+从最右边先通过 Expr.find 获得 seed 数组，在这里的 input 是 TAG，所以通过 `getElementsByTagName()` 函数。
+
+**第二步**
+
+重组 selector，此时除去 input 之后的 selector：
+
+```
+div > p + div.aaron [type="checkbox"]
+```
+
+**第三步**
+
+此时通过 Expr.relative 将 tokens 根据关系分成紧密关系和非紧密关系，比如 [">", "+"] 就是紧密关系，其 first = true。而对于 [" ", "~"] 就是非紧密关系。紧密关系在筛选时可以快速判断。
+
+matcherFromTokens 根据关系编译闭包函数，为四组：
+
+```
+div > 
+p + 
+div.aaron 
+input[type="checkbox"]
+```
+
+编译函数主要借助 Expr.filter 和 Expr.relative。
+
+**第四步**
+
+将所有的编译闭包函数放到一起，生成 superMatcher 函数。
+
+```javascript
+function( elem, context, xml ) {
+    var i = matchers.length;
+    while ( i-- ) {
+        if ( !matchers[i]( elem, context, xml ) ) {
+            return false;
+        }
+    }
+    return true;
+}
+```
+
+从右向左，处理 seed 集合，如果有一个不匹配，则返回 false。如果成功匹配，则说明该 seed 元素是符合筛选条件的，返回给 results。
+
 ## 参考
 
 >[jQuery 2.0.3 源码分析Sizzle引擎 - 编译函数（大篇幅）](http://www.cnblogs.com/aaronjs/p/3322466.html)
