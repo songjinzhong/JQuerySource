@@ -31,4 +31,4 @@
   + [x] [03-Sizzle](https://github.com/songjinzhong/JQuerySource/tree/master/03-Sizzle)- Sizzle 再 jQuery 中的应用
   + [x] [04-Sizzle-Tokens](https://github.com/songjinzhong/JQuerySource/tree/master/04-Sizzle-Tokens)- 介绍 Sizzle 函数中的词法分析，即 tokensize 函数
   + [x] [05-Sizzle-select](https://github.com/songjinzhong/JQuerySource/tree/master/05-Sizzle-select)- 介绍 Sizzle 中的 select 函数，对词法分析的结果进行处理，生成 seed
-  + [x] [06-Sizzle-compile](https://github.com/songjinzhong/JQuerySource/tree/master/05-Sizzle-compile)- 介绍 Sizzle 中的 compile 函数，用于生成 superMatcher，并通过 superMatcher，匹配 seed
+  + [x] [06-Sizzle-compile](https://github.com/songjinzhong/JQuerySource/tree/master/06-Sizzle-compile)- 介绍 Sizzle 中的 compile 函数，用于生成 superMatcher，并通过 superMatcher，匹配 seed
