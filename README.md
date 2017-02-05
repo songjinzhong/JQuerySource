@@ -1,6 +1,16 @@
 # jQuerySource
 决定你走多远的是基础，jQuery 源码分析，向长者膜拜！
 
+## 目录
+
+- Directory
+  + [x] [01-总体架构](https://github.com/songjinzhong/JQuerySource/tree/master/01-%E6%80%BB%E4%BD%93%E6%9E%B6%E6%9E%84)- 只有弄懂整体架构，后面的学习才好办
+  + [x] [02-init 构造器](https://github.com/songjinzhong/JQuerySource/tree/master/02-init%E6%9E%84%E9%80%A0%E5%99%A8)- 介绍 jQuery 的入口函数 init 的构造
+  + [x] [03-Sizzle](https://github.com/songjinzhong/JQuerySource/tree/master/03-Sizzle)- Sizzle 再 jQuery 中的应用
+  + [x] [04-Sizzle-Tokens](https://github.com/songjinzhong/JQuerySource/tree/master/04-Sizzle-Tokens)- 介绍 Sizzle 函数中的词法分析，即 tokensize 函数
+  + [x] [05-Sizzle-select](https://github.com/songjinzhong/JQuerySource/tree/master/05-Sizzle-select)- 介绍 Sizzle 中的 select 函数，对词法分析的结果进行处理，生成 seed
+  + [x] [06-Sizzle-compile](https://github.com/songjinzhong/JQuerySource/tree/master/06-Sizzle-compile)- 介绍 Sizzle 中的 compile 函数，用于生成 superMatcher，并通过 superMatcher，匹配 seed
+
 我虽然接触 jQuery 很久了，但也只是局限于表面使用的层次，碰到一些问题，找到 jQuery 的解决办法，然后使用。**显然**，这种做法的弊端就是，无论你怎么学，都只能是个小白。
 
 当我建立这个项目的时候，就表示，我要改变这一切了，做一些人想做，憧憬去做，但从没踏入第一步的事情，学习 jQuery 源码。
@@ -22,13 +32,3 @@
 另外还有下面的网址，让我在如何使用 jQuery 上得心应手：
 
 >[jQuery API 中文文档](http://www.css88.com/jqapi-1.9/)
-
-## 目录
-
-- Directory
-  + [x] [01-总体架构](https://github.com/songjinzhong/JQuerySource/tree/master/01-%E6%80%BB%E4%BD%93%E6%9E%B6%E6%9E%84)- 只有弄懂整体架构，后面的学习才好办
-  + [x] [02-init 构造器](https://github.com/songjinzhong/JQuerySource/tree/master/02-init%E6%9E%84%E9%80%A0%E5%99%A8)- 介绍 jQuery 的入口函数 init 的构造
-  + [x] [03-Sizzle](https://github.com/songjinzhong/JQuerySource/tree/master/03-Sizzle)- Sizzle 再 jQuery 中的应用
-  + [x] [04-Sizzle-Tokens](https://github.com/songjinzhong/JQuerySource/tree/master/04-Sizzle-Tokens)- 介绍 Sizzle 函数中的词法分析，即 tokensize 函数
-  + [x] [05-Sizzle-select](https://github.com/songjinzhong/JQuerySource/tree/master/05-Sizzle-select)- 介绍 Sizzle 中的 select 函数，对词法分析的结果进行处理，生成 seed
-  + [x] [06-Sizzle-compile](https://github.com/songjinzhong/JQuerySource/tree/master/06-Sizzle-compile)- 介绍 Sizzle 中的 compile 函数，用于生成 superMatcher，并通过 superMatcher，匹配 seed
