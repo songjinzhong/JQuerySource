@@ -10,6 +10,8 @@
   + [x] [04-Sizzle-Tokens](https://github.com/songjinzhong/JQuerySource/tree/master/04-Sizzle-Tokens)- 介绍 Sizzle 函数中的词法分析，即 tokensize 函数
   + [x] [05-Sizzle-select](https://github.com/songjinzhong/JQuerySource/tree/master/05-Sizzle-select)- 介绍 Sizzle 中的 select 函数，对词法分析的结果进行处理，生成 seed
   + [x] [06-Sizzle-compile](https://github.com/songjinzhong/JQuerySource/tree/master/06-Sizzle-compile)- 介绍 Sizzle 中的 compile 函数，用于生成 superMatcher，并通过 superMatcher，匹配 seed
+  + [x] [07-Callbacks](https://github.com/songjinzhong/JQuerySource/tree/master/07-Callbacks)- 这里介绍 jQuery 中的回调函数 Callbacks
+  + [x] [08-Data](https://github.com/songjinzhong/JQuerySource/tree/master/08-Data)- jQuery 中的缓存机制是什么样的，为什么不回造成内存泄漏，一起来见识见识
 
 我虽然接触 jQuery 很久了，但也只是局限于表面使用的层次，碰到一些问题，找到 jQuery 的解决办法，然后使用。**显然**，这种做法的弊端就是，无论你怎么学，都只能是个小白。
 
