@@ -314,6 +314,10 @@ jQuery.Callbacks = function(options) {
 
 还有就是当整个代码 firing 这个参数，导致当函数正在运行的时候，即执行两次 fire 的时候，需要补充 queue 元素，但 `fire()` 函数只执行一次。
 
+## 总结
+
+jQuery.Callbacks 沿用 jQuery 一贯的套路，最后 `return self`，刚看第一遍第二遍的时候，有点模模糊糊的，主要还是 once、memory 等 flag 参数干扰我的视线，尤其是其这些 flag 标志的实现，难受。
+
 ## 参考
 
 >[jQuery.Callbacks 中文文档](http://www.css88.com/jqapi-1.9/jQuery.Callbacks/)
