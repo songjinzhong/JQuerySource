@@ -13,6 +13,7 @@
   + [x] [07-Callbacks](https://github.com/songjinzhong/JQuerySource/tree/master/07-Callbacks)- 这里介绍 jQuery 中的回调函数 Callbacks
   + [x] [08-Data](https://github.com/songjinzhong/JQuerySource/tree/master/08-Data)- jQuery 中的缓存机制是什么样的，为什么不回造成内存泄漏，一起来见识见识
   + [x] [09-prevObject](https://github.com/songjinzhong/JQuerySource/tree/master/09-prevObject)- 你知道吗，jQuery 内部维护着一个对象栈
+  + [x] [10-hooks](https://github.com/songjinzhong/JQuerySource/tree/master/10-hooks)- jQuery 里的一些原理，你不了解，就会觉得恐惧，当你熟悉了之后，就会发现非常有意思，比如 Hooks
 
 我虽然接触 jQuery 很久了，但也只是局限于表面使用的层次，碰到一些问题，找到 jQuery 的解决办法，然后使用。**显然**，这种做法的弊端就是，无论你怎么学，都只能是个小白。
 
