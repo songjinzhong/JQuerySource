@@ -32,7 +32,7 @@ jQuery.fn.extend( {
 } )
 ```
 
-还缺少一个 one 方法：
+还缺少一个 one 方法，这个方法表示绑定的事件同类型只执行一次，[.one()](http://www.css88.com/jqapi-1.9/one/)：
 
 ```javascript
 jQuery.fn.extend( {
@@ -46,3 +46,7 @@ jQuery.fn.extend( {
 ## 参考
 
 >[jQuery 2.0.3 源码分析 事件体系结构](http://www.cnblogs.com/aaronjs/p/3441320.html)
+
+>[MDN EventTarget.addEventListener()](https://developer.mozilla.org/zh-CN/docs/Web/API/EventTarget/addEventListener)
+
+>[原生JavaScript事件详解](http://www.cnblogs.com/iyangyuan/p/4190773.html)
