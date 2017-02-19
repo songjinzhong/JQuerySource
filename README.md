@@ -16,6 +16,8 @@
   + [x] [10-hooks](https://github.com/songjinzhong/JQuerySource/tree/master/10-hooks)- jQuery 里的一些原理，你不了解，就会觉得恐惧，当你熟悉了之后，就会发现非常有意思，比如 Hooks
   + [x] [11-event-main](https://github.com/songjinzhong/JQuerySource/tree/master/11-event-main)- 事件委托算是 jQuery 中被广泛使用一个性能较好的辅助函数，那么，它是一个什么样的架构
   + [x] [12-event-extend](https://github.com/songjinzhong/JQuerySource/tree/master/12-event-extend)- 还是回头去把一些基础扎实一点，才去解读源码吧
+  + [x] [13-event-on](https://github.com/songjinzhong/JQuerySource/tree/master/13-event-on)- 分析一下 event 对象中两个重要的函数，add 和 dispatch
+  + [x] [14-event-trigger](https://github.com/songjinzhong/JQuerySource/tree/master/14-event-trigger)- jQuery 也提供自定义事件 trigger 和 triggerHandler
 
 我虽然接触 jQuery 很久了，但也只是局限于表面使用的层次，碰到一些问题，找到 jQuery 的解决办法，然后使用。**显然**，这种做法的弊端就是，无论你怎么学，都只能是个小白。
 
