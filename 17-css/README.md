@@ -117,6 +117,183 @@ function fixColor(elem){
 
 越来越有意思了。如果是 html5 中的 canvas，貌似又要去找。
 
+## fn.css() 源码
+
+好吧，步入正题了。我想，如果仔细看了前面面试题的同学，也该对原生 js 操作 css 做法完全懂了，jQuery 的思路也完全是如此，只是多了更多的兼容考虑：
+
+```javascript
+jQuery.fn.extend( {
+  css: function( name, value ) {
+    return access( this, function( elem, name, value ) {
+      var styles, len,
+        map = {},
+        i = 0;
+
+      if ( jQuery.isArray( name ) ) {
+        styles = getStyles( elem );
+        len = name.length;
+
+        for ( ; i < len; i++ ) {
+          map[ name[ i ] ] = jQuery.css( elem, name[ i ], false, styles );
+        }
+
+        return map;
+      }
+
+      return value !== undefined ?
+        jQuery.style( elem, name, value ) :
+        jQuery.css( elem, name );
+    }, name, value, arguments.length > 1 );
+  }
+} );
+```
+
+css 也是有 set 和 get 的，但是它们并不在 `fn.css` 函数里处理，set 对应 `jQuery.style`，get 对应 `jQuery.css`。
+
+在此之前，先来看一个很熟悉的函数：
+
+```javascript
+var getStyles = function( elem ) {
+
+    // Support: IE <=11 only, Firefox <=30 (#15098, #14150)
+    // IE throws on elements created in popups
+    // FF meanwhile throws on frame elements through "defaultView.getComputedStyle"
+    var view = elem.ownerDocument.defaultView;
+
+    if ( !view || !view.opener ) {
+      view = window;
+    }
+
+    return view.getComputedStyle( elem );
+  };
+```
+
+jQuery 已经不支持 currentStyle，也就是抛弃了低版本浏览器。
+
+```javascript
+jQuery.extend( {
+  camelCase: function( string ) {
+    return string.replace( /^-ms-/, "ms-" ).replace( /-([a-z])/g, function( all, letter ) {
+      return letter.toUpperCase();
+    } );
+  }
+} );
+```
+
+camelCase 也是一个很熟悉的函数（自动忽略 ms）。
+
+```javascript
+jQuery.extend( {
+style: function( elem, name, value, extra ) {
+
+    // 处理特殊情况 !elem.style 可以借鉴
+    if ( !elem || elem.nodeType === 3 || elem.nodeType === 8 || !elem.style ) {
+      return;
+    }
+
+    // Make sure that we're working with the right name
+    var ret, type, hooks,
+      origName = jQuery.camelCase( name ),
+      style = elem.style;
+
+    name = jQuery.cssProps[ origName ] ||
+      ( jQuery.cssProps[ origName ] = vendorPropName( origName ) || origName );
+
+    // hooks
+    hooks = jQuery.cssHooks[ name ] || jQuery.cssHooks[ origName ];
+
+    // Check if we're setting a value
+    if ( value !== undefined ) {
+      type = typeof value;
+
+      // Convert "+=" or "-=" to relative numbers (#7345)
+      if ( type === "string" && ( ret = rcssNum.exec( value ) ) && ret[ 1 ] ) {
+        value = adjustCSS( elem, name, ret );
+
+        // Fixes bug #9237
+        type = "number";
+      }
+
+      // Make sure that null and NaN values aren't set (#7116)
+      if ( value == null || value !== value ) {
+        return;
+      }
+
+      // If a number was passed in, add the unit (except for certain CSS properties)
+      if ( type === "number" ) {
+        value += ret && ret[ 3 ] || ( jQuery.cssNumber[ origName ] ? "" : "px" );
+      }
+
+      // background-* props affect original clone's values
+      if ( !support.clearCloneStyle && value === "" && name.indexOf( "background" ) === 0 ) {
+        style[ name ] = "inherit";
+      }
+
+      // If a hook was provided, use that value, otherwise just set the specified value
+      if ( !hooks || !( "set" in hooks ) ||
+        ( value = hooks.set( elem, value, extra ) ) !== undefined ) {
+
+        style[ name ] = value;
+      }
+
+    } else {
+
+      // If a hook was provided get the non-computed value from there
+      if ( hooks && "get" in hooks &&
+        ( ret = hooks.get( elem, false, extra ) ) !== undefined ) {
+
+        return ret;
+      }
+
+      // 千辛万苦，终于等到你
+      return style[ name ];
+    }
+  }
+} );
+```
+
+```javascript
+jQuery.extend( {
+css: function( elem, name, extra, styles ) {
+    var val, num, hooks,
+      origName = jQuery.camelCase( name );
+
+    // Make sure that we're working with the right name
+    name = jQuery.cssProps[ origName ] ||
+      ( jQuery.cssProps[ origName ] = vendorPropName( origName ) || origName );
+
+    // Try prefixed name followed by the unprefixed name
+    hooks = jQuery.cssHooks[ name ] || jQuery.cssHooks[ origName ];
+
+    // If a hook was provided get the computed value from there
+    if ( hooks && "get" in hooks ) {
+      val = hooks.get( elem, true, extra );
+    }
+
+    // Otherwise, if a way to get the computed value exists, use that
+    if ( val === undefined ) {
+      val = curCSS( elem, name, styles );
+    }
+
+    // Convert "normal" to computed value
+    if ( val === "normal" && name in cssNormalTransform ) {
+      val = cssNormalTransform[ name ];
+    }
+
+    // Make numeric if forced or a qualifier was provided and val looks numeric
+    if ( extra === "" || extra ) {
+      num = parseFloat( val );
+      return extra === true || isFinite( num ) ? num || 0 : val;
+    }
+    return val;
+  }
+} );
+```
+
+## 总结
+
+如果你对 css 看起来很吃力，请把那个微信面试题再仔细阅读一下吧。
+
 ## 参考
 
 >[解密jQuery内核 样式操作](http://www.cnblogs.com/aaronjs/p/3559310.html)
