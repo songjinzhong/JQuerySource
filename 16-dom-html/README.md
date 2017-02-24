@@ -72,6 +72,7 @@ var access = function( elems, fn, key, value, chainable, emptyGet, raw ) {
       }
     }
 
+    // css 走这一步
     if ( fn ) {
       for ( ; i < len; i++ ) {
         fn(
@@ -96,7 +97,7 @@ var access = function( elems, fn, key, value, chainable, emptyGet, raw ) {
 };
 ```
 
-access 中出现了一种 value 为函数的情况，没有碰到过，暂不知道什么意思。access 函数基本没有做太大的变化处理看，看起来也不是很难。
+access 中出现了一种 value 为函数的情况，没有碰到过，暂不知道什么意思。access 函数基本没有做太大的变化处理看，看起来也不是很难。(哈哈，找到了，后面 css 操作的时候，key 可以为 object)
 
 ## fn.html 源码
 
