@@ -21,6 +21,8 @@
   + [x] [13-event-on](https://github.com/songjinzhong/JQuerySource/tree/master/13-event-on)- 分析一下 event 对象中两个重要的函数，add 和 dispatch
   + [x] [14-event-trigger](https://github.com/songjinzhong/JQuerySource/tree/master/14-event-trigger)- jQuery 也提供自定义事件 trigger 和 triggerHandler
   + [x] [15-dom-domManip](https://github.com/songjinzhong/JQuerySource/tree/master/15-dom-domManip)- 长久以来，jQuery 中 dom 操作就被人喜爱
+  + [x] [16-dom-html](https://github.com/songjinzhong/JQuerySource/tree/master/16-dom-html)- 介绍一下 html 和 text 操作
+  + [x] [17-dom-css](https://github.com/songjinzhong/JQuerySource/tree/master/17-dom-css)- css 在 jQuery 中的使用频率很高的
 
 我虽然接触 jQuery 很久了，但也只是局限于表面使用的层次，碰到一些问题，找到 jQuery 的解决办法，然后使用。**显然**，这种做法的弊端就是，无论你怎么学，都只能是个小白。
 
