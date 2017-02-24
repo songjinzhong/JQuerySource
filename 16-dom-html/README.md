@@ -114,7 +114,7 @@ jQuery.fn.extends( {
         return elem.innerHTML;
       }
 
-      // set
+      // set 操作
       if ( typeof value === "string" && !rnoInnerhtml.test( value ) &&
         !wrapMap[ ( rtagName.exec( value ) || [ "", "" ] )[ 1 ].toLowerCase() ] ) {
 
@@ -126,6 +126,8 @@ jQuery.fn.extends( {
 
             // Remove element nodes and prevent memory leaks
             if ( elem.nodeType === 1 ) {
+
+              // cleanData 是清除 dom 绑定 cache 的数据
               jQuery.cleanData( getAll( elem, false ) );
               elem.innerHTML = value;
             }
@@ -144,6 +146,94 @@ jQuery.fn.extends( {
   }
 } );
 ```
+
+## fn.text 源码
+
+下面是 text 源码，关于 html 和 text 在开头已经介绍了，算是比较基础的 dom 操作吧，直接来看源码吧：
+
+```javascript
+jQuery.fn.extends( {
+  text: function( value ) {
+    return access( this, function( value ) {
+      // 前面已经说了，回调函数里的 this 指向 jQuery 对象
+      return value === undefined ?
+        // get
+        jQuery.text( this ) :
+        // set
+        this.empty().each( function() {
+          if ( this.nodeType === 1 || this.nodeType === 11 || this.nodeType === 9 ) {
+            this.textContent = value;
+          }
+        } );
+    }, null, value, arguments.length );
+  }
+} );
+```
+
+先来看看 set 的情况，这里有个 empty 函数，源码在下面，两个功能，先清空 dom 内容，在删除 data cache 中保存的数据。这里没有用 innerText 方法，而是使用 textContent 方法，貌似就 set 来说，textContent 兼容性更好。
+
+```javascript
+jQuery.fn.extends( {
+  empty: function() {
+    var elem,
+      i = 0;
+
+    for ( ; ( elem = this[ i ] ) != null; i++ ) {
+      if ( elem.nodeType === 1 ) {
+
+        // Prevent memory leaks
+        jQuery.cleanData( getAll( elem, false ) );
+
+        // 清空
+        elem.textContent = "";
+      }
+    }
+
+    return this;
+  },
+} );
+```
+
+set 的方法知道了，那么 get 呢？get 首先调用了 `jQuery.text` 方法，找了半天才找到它在哪里，原来调用的是 Sizzle 中的方法：
+
+```javascript
+jQuery.text = Sizzle.getText;
+
+var getText = Sizzle.getText = function( elem ) {
+  var node,
+    ret = "",
+    i = 0,
+    nodeType = elem.nodeType;
+
+  if ( !nodeType ) {
+    // elem 是一个 dom 数组
+    while ( (node = elem[i++]) ) {
+      // 分步来搞
+      ret += getText( node );
+    }
+  } else if ( nodeType === 1 || nodeType === 9 || nodeType === 11 ) {
+    // innerText usage removed for consistency of new lines (jQuery #11153)
+    // 依然使用 textContent 方法
+    if ( typeof elem.textContent === "string" ) {
+      return elem.textContent;
+    } else {
+      // Traverse its children
+      for ( elem = elem.firstChild; elem; elem = elem.nextSibling ) {
+        ret += getText( elem );
+      }
+    }
+  // 3 (text)或 4 (4 貌似被移除)直接返回 nodeValue
+  } else if ( nodeType === 3 || nodeType === 4 ) {
+    return elem.nodeValue;
+  }
+
+  return ret;
+};
+```
+
+## 总结
+
+我自己在浏览器上面测试，发现 textContent 方法并不会把空白符给删了，而且 jQuery 的 text 方法也没有做过滤，每个浏览器的解析也不一样，就可能导致浏览器带来的差异，实际使用的时候，还是要小心点好，多长个心眼。
 
 ## 参考
 
