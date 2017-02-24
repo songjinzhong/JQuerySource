@@ -59,6 +59,64 @@ function dashes(str){
 
 样式类型你随意，驼峰也好，破折号也好，我不 care。
 
+因此：
+
+```javascript
+function getStyle(elem, name){
+  var value, styles, l;
+  if(!name){ // 只有一个参数，直接返回吧
+    return false;
+  }
+  if(elem.nodeType !==1 && elem.nodeType !== 9 && elem.nodeType !== 11){
+    // 肯定不是 HTMLElement
+    return false;
+  }
+
+  name = camel(name); //将 name 转变成驼峰
+  value = elem.style[name];
+  if(value){
+    return value;
+  }
+  name = dashes(name); // 转换成破折形式
+  styles = (l = elem.currentStyle) ? l :
+    (l = document.defaultView.getComputedStyle) ? l(elem) : {};
+  return (l = styles[name]) ? l : false;
+}
+
+// 测试，无视驼峰和破折
+getStyle(dom, 'font-size'); // '16px'
+getStyle(dom, 'fontSize'); // '16px'
+```
+
+这道题目还是很有意思的，当然，答案还不止，还可以继续优化，这样可以给面试官好感，[链接](http://www.jianshu.com/p/e94b5779f998)。
+
+因为我们测的是 background-color，这个属性很特别，当它是 `inherit`表示继承父类，`transparent` 表示透明，也该为 flase，看：
+
+```javascript
+function fixColor(elem){
+  var color = getStyle(elem, 'background-color');
+  if(color){
+    if(color == 'transparent' || color == 'rgba(0, 0, 0, 0)')
+      return false;
+    else if(getStyle(elem, 'opacity') == '0'){
+      return false; // 透明
+    }
+    else if(getStyle(elem, 'display') == 'none'){
+      return false; // ..
+    }
+    else if(getStyle(elem, 'visibility') == 'hidden'){
+      return false; // ..
+    }
+  }
+  if(color == 'inherit'){
+    return elem.parentNode ? fixColor(elem.parentNode) : false;
+  }
+  return color;
+}
+```
+
+越来越有意思了。如果是 html5 中的 canvas，貌似又要去找。
+
 ## 参考
 
 >[解密jQuery内核 样式操作](http://www.cnblogs.com/aaronjs/p/3559310.html)
