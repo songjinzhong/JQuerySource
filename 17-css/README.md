@@ -39,25 +39,23 @@ styleList.color; // 'red'
 
 当 `styleList.color` 不变的时候，就知道可能有 important 样式的存在，也可以作为判断 important 的一个标准。
 
-样式表有 `font-size`，有人写成驼峰 `fontSize`，这可以理解，统一一下就好啦，关键是有一个**超级别扭**的地方，`elem.style` 采用的是驼峰写法，而 getComputedStyle 的样式表采用的是破折号的写法，既然这样，只能借助下面这两个函数来：
+样式表有 `font-size`，有人写成驼峰 `fontSize`，这可以理解，统一一下就好啦。由于 `elem.style` 和 `getComputedStyle` 使用的是驼峰写法（实际上即使用破折法去获取也是可以得到的）要借助下面这两个函数来：
 
 ```javascript
-// 驼峰-破折 都变成驼峰
+// 变成驼峰
 function camel(str){
   return str.replace(/-(\w)/g, function(m0, m1){
     return m1.toUpperCase();
   })
 }
 
-// 驼峰-破折 都变成破折
+// 变成破折
 function dashes(str){
   return str.replace(/[A-Z]/g, function(m0){
     return '-' + m0.toLowerCase();
   })
 }
 ```
-
-样式类型你随意，驼峰也好，破折号也好，我不 care。
 
 因此：
 
@@ -77,7 +75,6 @@ function getStyle(elem, name){
   if(value){
     return value;
   }
-  name = dashes(name); // 转换成破折形式
   styles = (l = elem.currentStyle) ? l :
     (l = document.defaultView.getComputedStyle) ? l(elem) : {};
   return (l = styles[name]) ? l : false;
