@@ -31,7 +31,9 @@ jQuery.fn.extends( {
 } );
 ```
 
-好吧，我承认，又是同样的套路，先交给 access 函数来处理，然后 callback 函数，我猜这个时候 callback 函数肯定是采用 call 方式使 this 绑定当前 elem。这个套路似曾相识，对，就是 domManip 函数，那么，这个 access 都干了些什么呢？它是一个什么样的函数？
+好吧，我承认，又是同样的套路，先交给 access 函数来处理，然后 callback 函数，我猜这个时候 callback 函数肯定是采用 call 方式使 this 绑定当前 elem。这个套路似曾相识，对，就是 domManip 函数。
+
+其实 access 前面已经介绍了过了，不过还是值得来重现介绍一下。
 
 像 html、text、css 这些函数的功能，都有一个特点，就是可以带参数，也可以不带参数，先用 access 函数对参数校正，执行回调。
 

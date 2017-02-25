@@ -4,9 +4,9 @@ hooks 的使用非常用技术含量，可以支撑在原来的基础上扩展�
 
 ## 先来说说 attr 和 prop
 
-不急着上来就谈 hooks，先来看看 hooks 涉及到的应用。一个典型的应用就是 `fn.attr` 和 `fn.prop`，这两个原型函数的作用是用来给 jQuery 对象绑定元素的，如果不了解，可以参考这两个链接，[attr](http://www.css88.com/jqapi-1.9/attr/)，[链接2](http://www.css88.com/jqapi-1.9/prop/)。
+不急着上来就谈 hooks，先来看看 hooks 涉及到的应用。一个典型的应用就是 `fn.attr` 和 `fn.prop`，这两个原型函数的作用是用来给 jQuery 对象绑定元素的，如果不了解，可以参考这两个链接，[attr](http://www.css88.com/jqapi-1.9/attr/)，[prop](http://www.css88.com/jqapi-1.9/prop/)。
 
-虽然它们都是添加属性，却是不同的方式，其中，attr 是把属性放到 html 中，而 prop 是把属性添加到 dom 对象上，可以通过 . 来读取。
+虽然它们都是添加属性，却是不同的方式，其中，attr 是把属性放到 html 中(实际上是 elem.attributes 属性)，而 prop 是把属性添加到 dom 对象上，可以通过 [.] 来读取。
 
 那么什么叫做 html 中？就是我们常说的 `data-` 数据：
 
@@ -17,7 +17,7 @@ body.attr('data-name','body');
 body.data('name'); //'body'
 ```
 
-attr 方法是对应于 jQuery 中的方法，而内部是通过 setAttribute，getAttribute 这种低级 api 来实现的，而且在 dom 对象的 attributes 属性上是可以找到绑定值的，所以 attr 和 prop 方法其实同属一家。
+attr 方法是对应于 jQuery 中的方法，而内部是通过 setAttribute，getAttribute 这种低级 api 来实现的，而且在 dom 对象的 attributes 属性上是可以找到绑定值的，所以 attr 和 prop 是两种不同的方法。
 
 这两个函数有四个功能，分别包括读取和设置，如果参数只有一个，表示读（如果参数是 Object 另外考虑），参数为两个，表示写。
 
