@@ -213,6 +213,8 @@ toggleClass 使用的频率也比较高。
 
 先来看看大致用法，你肯定会忽略它的第二个参数的意思。[.toggleClass()](http://www.css88.com/jqapi-1.9/toggleClass/)，当第二个参数为 true 的情况，就是 addClass，为 false 时，removeClass，从源码来看，就是直接调用的这两个函数。
 
+除了两个参数，还有无参和只有 false 情况，下面也都有明确的处理办法。
+
 ```javascript
 jQuery.fn.extend( {
 toggleClass: function( value, stateVal ) {
@@ -244,7 +246,7 @@ toggleClass: function( value, stateVal ) {
 
         while ( ( className = classNames[ i++ ] ) ) {
 
-          // Check each className given, space separated list
+          // 有则删，无则加，逻辑很简单
           if ( self.hasClass( className ) ) {
             self.removeClass( className );
           } else {
@@ -252,7 +254,7 @@ toggleClass: function( value, stateVal ) {
           }
         }
 
-      // Toggle whole class name
+      // 当无参或只有一个 false 时，所有 class 都执行
       } else if ( value === undefined || type === "boolean" ) {
         className = getClass( this );
         if ( className ) {
@@ -261,10 +263,6 @@ toggleClass: function( value, stateVal ) {
           dataPriv.set( this, "__className__", className );
         }
 
-        // If the element has a class name or if we're passed `false`,
-        // then remove the whole classname (if there was one, the above saved it).
-        // Otherwise bring back whatever was previously saved (if anything),
-        // falling back to the empty string if nothing was stored.
         if ( this.setAttribute ) {
           this.setAttribute( "class",
             className || value === false ?
@@ -277,6 +275,22 @@ toggleClass: function( value, stateVal ) {
   }
 } );
 ```
+
+看得出来，这个逻辑和前面两个很像，不过当无参或只有一个 boolean 且 false 时，先将当前的 className 保存到 data cache 中，然后实现 toggle 操作：
+
+```javascript
+if ( this.setAttribute ) {
+  this.setAttribute( "class",
+    className || value === false ? // 判断条件
+    "" : // 有则设空
+    dataPriv.get( this, "__className__" ) || "" // 无则从 data cache 取
+  );
+}
+```
+
+## 总结
+
+感觉 jQuery 中的 class 操作不是很复杂，难道是我在进步吗，哈哈。
 
 ## 参考
 
