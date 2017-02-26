@@ -23,6 +23,8 @@
   + [x] [15-dom-domManip](https://github.com/songjinzhong/JQuerySource/tree/master/15-dom-domManip)- 长久以来，jQuery 中 dom 操作就被人喜爱
   + [x] [16-dom-html](https://github.com/songjinzhong/JQuerySource/tree/master/16-dom-html)- 介绍一下 html 和 text 操作
   + [x] [17-dom-css](https://github.com/songjinzhong/JQuerySource/tree/master/17-dom-css)- css 在 jQuery 中的使用频率很高的
+  + [x] [18-dom-class](https://github.com/songjinzhong/JQuerySource/tree/master/18-dom-class)- jQuery 中的 class 操作，包括 add，remove，has 和 toggle
+  + [x] [19-ajax](https://github.com/songjinzhong/JQuerySource/tree/master/19-ajax)- jQuery 中的 ajax 方法介绍
 
 我虽然接触 jQuery 很久了，但也只是局限于表面使用的层次，碰到一些问题，找到 jQuery 的解决办法，然后使用。**显然**，这种做法的弊端就是，无论你怎么学，都只能是个小白。
 
