@@ -104,6 +104,368 @@ var deferred = jQuery.Deferred(),
   completeDeferred = jQuery.Callbacks( "once memory" );
 ```
 
+所以说 jQuery 是一个自给自足的库，一点也不过分，前面有 Sizzle，整个源码到处都充满着 extend 函数，等等。
+
+### jQuery.ajaxSetup
+
+ajaxSetup 是在 ajax 函数里比较早执行的一个函数，这个函数主要是用来校准参数用的；
+
+```javascript
+jQuery.extend( {
+  ajaxSetup: function( target, settings ) {
+    return settings ?
+
+      // 双层的 ajaxExtend 函数
+      ajaxExtend( ajaxExtend( target, jQuery.ajaxSettings ), settings ) :
+
+      // Extending ajaxSettings
+      ajaxExtend( jQuery.ajaxSettings, target );
+  },
+} );
+```
+
+ajaxSettings 是一个对象，具体是干什么用的，看看就知道了：
+
+```javascript
+jQuery.ajaxSettings = {
+  url: location.href,
+  type: "GET",
+  isLocal: rlocalProtocol.test( location.protocol ),
+  global: true,
+  processData: true,
+  async: true,
+  contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+
+  accepts: {
+    "*": allTypes,
+    text: "text/plain",
+    html: "text/html",
+    xml: "application/xml, text/xml",
+    json: "application/json, text/javascript"
+  },
+
+  contents: {
+    xml: /\bxml\b/,
+    html: /\bhtml/,
+    json: /\bjson\b/
+  },
+
+  responseFields: {
+    xml: "responseXML",
+    text: "responseText",
+    json: "responseJSON"
+  },
+
+  // Data converters
+  // Keys separate source (or catchall "*") and destination types with a single space
+  converters: {
+
+    // Convert anything to text
+    "* text": String,
+
+    // Text to html (true = no transformation)
+    "text html": true,
+
+    // Evaluate text as a json expression
+    "text json": JSON.parse,
+
+    // Parse text as xml
+    "text xml": jQuery.parseXML
+  },
+
+  // For options that shouldn't be deep extended:
+  // you can add your own custom options here if
+  // and when you create one that shouldn't be
+  // deep extended (see ajaxExtend)
+  flatOptions: {
+    url: true,
+    context: true
+  }
+}
+```
+
+ajaxSettings 原来是一个加强版的 options。
+
+ajaxExtend 是用来将 ajax 函数参数进行标准化的，看看哪些参数没有赋值，让它等于默认值，由于 ajaxExtend 是双层的，具体要调试了才能更明白。
+
+```javascript
+function ajaxExtend( target, src ) {
+  var key, deep,
+    flatOptions = jQuery.ajaxSettings.flatOptions || {};
+
+  for ( key in src ) {
+    if ( src[ key ] !== undefined ) {
+      ( flatOptions[ key ] ? target : ( deep || ( deep = {} ) ) )[ key ] = src[ key ];
+    }
+  }
+  if ( deep ) {
+    jQuery.extend( true, target, deep );
+  }
+
+  return target;
+}
+```
+
+### ajax.jqXHR
+
+在 ajax 中有一个非常重要的对象，jqXHR，它虽然是一个简称，但通过缩写也大致能猜出它是 `jquery-XMLHttpRequest`。
+
+```javascript
+jqXHR = {
+  readyState: 0, // 0-4
+
+  // 熟悉响应头的对这个应该不陌生，将响应头数据按照 key value 存储起来
+  getResponseHeader: function( key ) {
+    var match;
+    if ( completed ) {
+      if ( !responseHeaders ) {
+        responseHeaders = {};
+        while ( ( match = /^(.*?):[ \t]*([^\r\n]*)$/mg.exec( responseHeadersString ) ) ) {
+          responseHeaders[ match[ 1 ].toLowerCase() ] = match[ 2 ];
+        }
+      }
+      match = responseHeaders[ key.toLowerCase() ];
+    }
+    return match == null ? null : match;
+  },
+
+  // Raw string
+  getAllResponseHeaders: function() {
+    return completed ? responseHeadersString : null;
+  },
+
+  // 手动设置请求头
+  setRequestHeader: function( name, value ) {
+    if ( completed == null ) {
+      name = requestHeadersNames[ name.toLowerCase() ] =
+        requestHeadersNames[ name.toLowerCase() ] || name;
+      requestHeaders[ name ] = value;
+    }
+    return this;
+  },
+
+  // Overrides response content-type header
+  overrideMimeType: function( type ) {
+    if ( completed == null ) {
+      s.mimeType = type;
+    }
+    return this;
+  },
+
+  // Status-dependent callbacks
+  statusCode: function( map ) {
+    var code;
+    if ( map ) {
+      if ( completed ) {
+
+        // Execute the appropriate callbacks
+        jqXHR.always( map[ jqXHR.status ] );
+      } else {
+
+        // Lazy-add the new callbacks in a way that preserves old ones
+        for ( code in map ) {
+          statusCode[ code ] = [ statusCode[ code ], map[ code ] ];
+        }
+      }
+    }
+    return this;
+  },
+
+  // Cancel the request
+  abort: function( statusText ) {
+    var finalText = statusText || strAbort;
+    if ( transport ) {
+      transport.abort( finalText );
+    }
+    done( 0, finalText );
+    return this;
+  }
+};
+```
+
+jqXHR 已经完全可以取代 XHR 对象了，函数都进行扩展了。
+
+### ajaxTransport
+
+那么 XMLHttpRequest 这个函数到底在哪呢？
+
+jQuery 中有两个属性，分别是 `ajaxPrefilter` 和 `ajaxTransport`，它们是由 `addToPrefiltersOrTransports` 函数构造的。主要来看 ajaxTransport 函数：
+
+```javascript
+jQuery.ajaxTransport( function( options ) {
+  var callback, errorCallback;
+
+  // Cross domain only allowed if supported through XMLHttpRequest
+  if ( support.cors || xhrSupported && !options.crossDomain ) {
+    return {
+      send: function( headers, complete ) {
+        var i,
+          xhr = options.xhr();// xhr() = XMLHttpRequest()
+        xhr.open(
+          options.type,
+          options.url,
+          options.async,
+          options.username,
+          options.password
+        );
+
+        // Apply custom fields if provided
+        if ( options.xhrFields ) {
+          for ( i in options.xhrFields ) {
+            xhr[ i ] = options.xhrFields[ i ];
+          }
+        }
+
+        // Override mime type if needed
+        if ( options.mimeType && xhr.overrideMimeType ) {
+          xhr.overrideMimeType( options.mimeType );
+        }
+
+        // X-Requested-With header
+        // For cross-domain requests, seeing as conditions for a preflight are
+        // akin to a jigsaw puzzle, we simply never set it to be sure.
+        // (it can always be set on a per-request basis or even using ajaxSetup)
+        // For same-domain requests, won't change header if already provided.
+        if ( !options.crossDomain && !headers[ "X-Requested-With" ] ) {
+          headers[ "X-Requested-With" ] = "XMLHttpRequest";
+        }
+
+        // Set headers
+        for ( i in headers ) {
+          xhr.setRequestHeader( i, headers[ i ] );
+        }
+
+        // Callback
+        callback = function( type ) {
+          return function() {
+            if ( callback ) {
+              callback = errorCallback = xhr.onload =
+                xhr.onerror = xhr.onabort = xhr.onreadystatechange = null;
+
+              if ( type === "abort" ) {
+                xhr.abort();
+              } else if ( type === "error" ) {
+
+                // Support: IE <=9 only
+                // On a manual native abort, IE9 throws
+                // errors on any property access that is not readyState
+                if ( typeof xhr.status !== "number" ) {
+                  complete( 0, "error" );
+                } else {
+                  complete(
+
+                    // File: protocol always yields status 0; see #8605, #14207
+                    xhr.status,
+                    xhr.statusText
+                  );
+                }
+              } else {
+                complete(
+                  xhrSuccessStatus[ xhr.status ] || xhr.status,
+                  xhr.statusText,
+
+                  // Support: IE <=9 only
+                  // IE9 has no XHR2 but throws on binary (trac-11426)
+                  // For XHR2 non-text, let the caller handle it (gh-2498)
+                  ( xhr.responseType || "text" ) !== "text"  ||
+                  typeof xhr.responseText !== "string" ?
+                    { binary: xhr.response } :
+                    { text: xhr.responseText },
+                  xhr.getAllResponseHeaders()
+                );
+              }
+            }
+          };
+        };
+
+        // Listen to events
+        xhr.onload = callback();
+        errorCallback = xhr.onerror = callback( "error" );
+
+        // Support: IE 9 only
+        // Use onreadystatechange to replace onabort
+        // to handle uncaught aborts
+        if ( xhr.onabort !== undefined ) {
+          xhr.onabort = errorCallback;
+        } else {
+          xhr.onreadystatechange = function() {
+
+            // Check readyState before timeout as it changes
+            if ( xhr.readyState === 4 ) {
+
+              // Allow onerror to be called first,
+              // but that will not handle a native abort
+              // Also, save errorCallback to a variable
+              // as xhr.onerror cannot be accessed
+              window.setTimeout( function() {
+                if ( callback ) {
+                  errorCallback();
+                }
+              } );
+            }
+          };
+        }
+
+        // Create the abort callback
+        callback = callback( "abort" );
+
+        try {
+
+          // Do send the request (this may raise an exception)
+          xhr.send( options.hasContent && options.data || null );
+        } catch ( e ) {
+
+          // #14683: Only rethrow if this hasn't been notified as an error yet
+          if ( callback ) {
+            throw e;
+          }
+        }
+      },
+
+      abort: function() {
+        if ( callback ) {
+          callback();
+        }
+      }
+    };
+  }
+} );
+```
+ajaxTransport 函数返回值有两个，其中 send 就是发送函数了，一步一步，发送下来，无需多说明。
+
+另外，ajax 对于 jQuery 对象在 ajax 过程提供了很多回调函数：
+
+```javascript
+jQuery.each( [
+  "ajaxStart",
+  "ajaxStop",
+  "ajaxComplete",
+  "ajaxError",
+  "ajaxSuccess",
+  "ajaxSend"
+], function( i, type ) {
+  jQuery.fn[ type ] = function( fn ) {
+    return this.on( type, fn );
+  };
+} );
+
+jQuery.event.trigger( "ajaxStart" );
+...
+globalEventContext.trigger( "ajaxSend", [ jqXHR, s ] );
+...
+globalEventContext.trigger( isSuccess ? "ajaxSuccess" : "ajaxError",[ jqXHR, s, isSuccess ? success : error ] );
+...
+globalEventContext.trigger( "ajaxComplete", [ jqXHR, s ] );
+...
+jQuery.event.trigger( "ajaxStop" );
+```
+
+ajax 东西太多了，至少有 1000 行的代码吧。
+
+## 总结
+
+关于 ajax，不想去深入研究了，最近暑假实习校招已经开始启动了，暂时先放一放吧，以后有时间再来填坑吧。
+
 ## 参考
 
 >[jQuery源码分析系列(30) : Ajax 整体结构](http://www.cnblogs.com/aaronjs/p/3683925.html)
