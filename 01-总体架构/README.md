@@ -102,7 +102,7 @@ jQuery.fn = jQuery.prototype = {
 }
 ```
 
-那么为什么要用 fn 指向 prototype？我本人查阅了一些资料，貌似还是下面的回答比较中肯：简介。你不觉得 fn 比 prototype 好写多了吗。
+那么为什么要用 fn 指向 prototype？我本人查阅了一些资料，貌似还是下面的回答比较中肯：简洁。你不觉得 fn 比 prototype 好写多了吗。
 
 借用网上的一张图：
 
